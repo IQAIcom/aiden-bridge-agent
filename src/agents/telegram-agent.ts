@@ -1,4 +1,5 @@
 import { Agent, McpToolset } from "@iqai/adk";
+import dedent from "dedent";
 import { env } from "../env";
 
 export const getTelegramAgent = async () => {
@@ -38,4 +39,22 @@ export const getTelegramAgent = async () => {
 	});
 
 	return agent;
+};
+
+export const sendTelegramMessage = (telegramAgent: Agent, message: string) => {
+	const SYSTEM_PROMPT = dedent`
+    You are a telegram message forwarder, User will provide you with a message, you will forward the message to the telegram group.
+  `;
+	telegramAgent.run({
+		messages: [
+			{
+				role: "system",
+				content: SYSTEM_PROMPT,
+			},
+			{
+				role: "user",
+				content: message,
+			},
+		],
+	});
 };
