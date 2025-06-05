@@ -1,0 +1,46 @@
+{
+	"name": "adk-agent-starter",
+	"version": "0.0.1",
+	"description": "adk-agent-starter is a starter project for creating adk agents",
+	"main": "dist/index.js",
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsx watch src/index.ts",
+		"start": "node dist/index.js",
+		"clean": "rimraf dist",
+		"prebuild": "pnpm clean",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write .",
+		"format": "biome format --write .",
+		"prepare": "husky",
+		"precommit": "lint-staged"
+	},
+	"lint-staged": {
+		"*.{ts,js,json}": ["biome check --write"]
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/IQAICOM/adk-agent-starter.git"
+	},
+	"keywords": ["ai", "agent", "mcp", "adk-ts", "IQAI"],
+	"author": "IQAI",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/IQAICOM/adk-agent-starter/issues"
+	},
+	"homepage": "https://github.com/IQAICOM/adk-agent-starter#readme",
+	"dependencies": {
+		"@iqai/adk": "^0.0.4",
+		"dotenv": "^16.4.5",
+		"zod": "^3.23.8"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"@types/node": "^22.15.29",
+		"husky": "^9.0.0",
+		"lint-staged": "^16.1.0",
+		"rimraf": "^6.0.1",
+		"tsx": "^4.19.2",
+		"typescript": "^5.7.2"
+	}
+}
