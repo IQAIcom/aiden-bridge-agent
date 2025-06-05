@@ -35,7 +35,7 @@ export const getTelegramAgent = async () => {
 		name: "Telegram Agent",
 		description: "Shares bridge updates to telegram group",
 		model: "gemini-2.0-flash",
-		tools: [...telegramTools],
+		tools: telegramTools,
 	});
 
 	return agent;
