@@ -16,13 +16,21 @@
 		"precommit": "lint-staged"
 	},
 	"lint-staged": {
-		"*.{ts,js,json}": ["biome check --write"]
+		"*.{ts,js,json}": [
+			"biome check --write"
+		]
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/IQAICOM/adk-agent-starter.git"
 	},
-	"keywords": ["ai", "agent", "mcp", "adk-ts", "IQAI"],
+	"keywords": [
+		"ai",
+		"agent",
+		"mcp",
+		"adk-ts",
+		"IQAI"
+	],
 	"author": "IQAI",
 	"license": "MIT",
 	"bugs": {
@@ -31,7 +39,9 @@
 	"homepage": "https://github.com/IQAICOM/adk-agent-starter#readme",
 	"dependencies": {
 		"@iqai/adk": "^0.0.4",
+		"dedent": "^1.6.0",
 		"dotenv": "^16.4.5",
+		"viem": "^2.30.6",
 		"zod": "^3.23.8"
 	},
 	"devDependencies": {
