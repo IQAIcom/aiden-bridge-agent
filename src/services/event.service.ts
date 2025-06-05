@@ -6,30 +6,16 @@ import {
 	IQ_TOKEN_ETHEREUM_ADDRESS,
 	MIN_IQ_THRESHOLD,
 } from "../lib/constants.js";
-import type { WalletService } from "./wallet.js";
-
-export interface BridgeEvent {
-	blockNumber: number;
-	txHash: string;
-	from: Address;
-	to: Address;
-	amount: bigint;
-	timestamp: number;
-}
+import { type BridgeEvent, bridgeEvents } from "../lib/events.js";
+import type { WalletService } from "./wallet.service.js";
 
 export class EventService {
-	isWatching = false;
-	private unsubscribe: (() => void) | null = null;
+	constructor(private walletService: WalletService) {}
 
-	constructor(
-		private walletService: WalletService,
-		private onBridgeEvent: (event: BridgeEvent) => void,
-	) {}
-
-	async startWatching(): Promise<void> {
+	async startWatching() {
 		const ethClient = this.walletService.getPublicEthClient();
 
-		this.unsubscribe = ethClient.watchContractEvent({
+		ethClient.watchContractEvent({
 			address: BRIDGE_ADDRESS,
 			abi: BRIDGE_EVENT_ABI,
 			eventName: "ERC20BridgeInitiated",
@@ -37,17 +23,7 @@ export class EventService {
 			fromBlock: 22032073n,
 		});
 
-		this.isWatching = true;
-
 		console.log(`👀 Watching bridge events on ${BRIDGE_ADDRESS}`);
-	}
-
-	async stopWatching(): Promise<void> {
-		if (this.unsubscribe) {
-			this.unsubscribe();
-			this.unsubscribe = null;
-			this.isWatching = false;
-		}
 	}
 
 	private async handleBridgeEvents(logs: any[]): Promise<void> {
@@ -57,7 +33,7 @@ export class EventService {
 			try {
 				const bridgeEvent = await this.processBridgeLog(log);
 				if (bridgeEvent) {
-					this.onBridgeEvent(bridgeEvent);
+					bridgeEvents.emit("bridge:detected", bridgeEvent);
 				}
 			} catch (error) {
 				console.error("❌ Error processing bridge event:", error);

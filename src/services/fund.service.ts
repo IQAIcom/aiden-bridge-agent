@@ -1,38 +1,29 @@
 import { type Address, formatEther, withRetry } from "viem";
 import { fraxtal } from "viem/chains";
 import { FUNDING_AMOUNT } from "../lib/constants.js";
-import type { BridgeEvent } from "./event.service.js";
-import type { WalletService } from "./wallet.js";
-
-export interface FundingEvent {
-	recipient: Address;
-	amount: bigint;
-	txHash: string;
-	timestamp: number;
-}
+import {
+	type BridgeEvent,
+	type FundingEvent,
+	bridgeEvents,
+} from "../lib/events.js";
+import type { WalletService } from "./wallet.service.js";
 
 export class FundService {
 	private readonly fundingAmount: bigint = FUNDING_AMOUNT;
-	constructor(
-		private walletService: WalletService,
-		private onFundingComplete: (event: FundingEvent) => void,
-		private onSufficientBalanceSkip: (event: BridgeEvent) => void,
-	) {}
 
-	async processBridgeEvent(event: BridgeEvent): Promise<void> {
-		// Determine recipient (use 'from' if 'to' is zero address)
+	constructor(private walletService: WalletService) {}
+
+	startWatching(): void {
+		bridgeEvents.on("bridge:detected", this.fundRecipient.bind(this));
+		console.log("💰 Fund service started watching for bridge events");
+	}
+
+	private async fundRecipient(event: BridgeEvent): Promise<void> {
 		const recipient =
 			event.to === "0x0000000000000000000000000000000000000000"
 				? event.from
 				: event.to;
 
-		await this.fundRecipient(recipient, event);
-	}
-
-	private async fundRecipient(
-		recipient: Address,
-		event: BridgeEvent,
-	): Promise<void> {
 		try {
 			console.log(`💰 Checking funding for ${recipient}`);
 
@@ -43,7 +34,7 @@ export class FundService {
 				console.log(
 					"✅ Recipient already has sufficient ETH, no funding needed",
 				);
-				this.onSufficientBalanceSkip(event);
+				bridgeEvents.emit("funding:skipped", event);
 				return;
 			}
 
@@ -94,7 +85,7 @@ export class FundService {
 						timestamp: Date.now(),
 					};
 
-					this.onFundingComplete(fundingEvent);
+					bridgeEvents.emit("funding:completed", fundingEvent);
 					console.log(
 						`✅ Successfully funded ${recipient} with ${formatEther(amount)} ETH`,
 					);
