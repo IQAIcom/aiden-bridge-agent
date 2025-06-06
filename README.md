@@ -1,13 +1,13 @@
 # 🌉 Aiden Bridge Agent
 
-An intelligent agent that monitors IQ token bridge transactions and automatically funds user wallets on Fraxtal L2. Built with the `@iqai/adk` library and integrated with Telegram notifications.
+An intelligent agent that monitors token bridge transactions and automatically funds user wallets on Fraxtal L2. Built with the `@iqai/adk` library and integrated with Telegram notifications.
 
 ## 🚀 Features
 
-- **Real-time Bridge Monitoring**: Watches Ethereum mainnet for IQ token bridge events
-- **Automatic Funding**: Funds user wallets on Fraxtal L2 when they bridge IQ tokens
+- **Real-time Bridge Monitoring**: Watches Ethereum mainnet for ERC20 token bridge events
+- **Automatic Funding**: Funds user wallets on Fraxtal L2 when they bridge any ERC20 tokens
 - **Telegram Integration**: Sends notifications about bridge events and funding activities
-- **Threshold-based**: Only processes bridges above a minimum IQ threshold
+- **Universal Token Support**: Processes bridges for any ERC20 token
 - **Retry Logic**: Robust error handling with automatic retries
 
 ## 🚀 Get Started
@@ -45,26 +45,22 @@ pnpm dev
 ## 🔄 How It Works
 
 1. **Event Monitoring**: The agent watches the bridge contract on Ethereum for `ERC20BridgeInitiated` events
-2. **IQ Token Filtering**: Only processes events for IQ token bridges
-3. **Threshold Check**: Verifies the bridged amount meets the minimum threshold (1500 IQ)
-4. **Balance Check**: Checks if the recipient has sufficient ETH on Fraxtal L2
-5. **Auto Funding**: Sends ETH to users who need it for transaction fees
-6. **Notifications**: Sends updates via Telegram about bridge events and funding activities
+2. **Universal Processing**: Processes bridge events for any ERC20 token
+3. **Balance Check**: Checks if the recipient has sufficient FRAX on Fraxtal L2
+4. **Auto Funding**: Sends FRAX to users who need it for transaction fees
+5. **Notifications**: Sends updates via Telegram about bridge events and funding activities
 
 ## 📊 Event Flow
 
 ```mermaid
 graph TD
-    A[User bridges IQ tokens] --> B[Event detected on Ethereum]
-    B --> C{Amount ≥ 1500 IQ?}
-    C -->|No| D[Skip funding]
-    C -->|Yes| E[Check Fraxtal balance]
-    E --> F{Balance < 0.01 FRAX?}
-    F -->|No| G[No funding needed]
-    F -->|Yes| H[Send ETH to user]
-    H --> I[Send Telegram notification]
-    D --> I
-    G --> I
+    A[User bridges ERC20 tokens] --> B[Event detected on Ethereum]
+    B --> C[Check Fraxtal balance]
+    C --> D{Balance < 0.01 FRAX?}
+    D -->|No| E[No funding needed]
+    D -->|Yes| F[Send FRAX to user]
+    F --> G[Send Telegram notification]
+    E --> G
 ```
 
 ## 🤖 Telegram Integration
@@ -72,7 +68,7 @@ graph TD
 The agent uses a Telegram agent to send notifications about:
 - Bridge events detected
 - Funding transactions completed
-- Funding skipped (insufficient balance or below threshold)
+- Funding skipped (sufficient balance)
 
 Messages are automatically formatted and sent to your configured Telegram chat.
 
