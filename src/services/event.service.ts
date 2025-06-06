@@ -49,7 +49,7 @@ export class EventService {
       Tx:      ${log.transactionHash}`);
 
 		return {
-			blockNumber: log.blockNumber,
+			blockNumber: Number(log.blockNumber),
 			txHash: log.transactionHash,
 			from: from as Address,
 			to: to as Address,
