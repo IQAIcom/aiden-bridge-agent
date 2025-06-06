@@ -46,8 +46,8 @@ pnpm dev
 
 1. **Event Monitoring**: The agent watches the bridge contract on Ethereum for `ERC20BridgeInitiated` events
 2. **Universal Processing**: Processes bridge events for any ERC20 token
-3. **Balance Check**: Checks if the recipient has sufficient ETH on Fraxtal L2
-4. **Auto Funding**: Sends ETH to users who need it for transaction fees
+3. **Balance Check**: Checks if the recipient has sufficient FRAX on Fraxtal L2
+4. **Auto Funding**: Sends FRAX to users who need it for transaction fees
 5. **Notifications**: Sends updates via Telegram about bridge events and funding activities
 
 ## 📊 Event Flow
