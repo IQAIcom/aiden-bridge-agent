@@ -1,11 +1,7 @@
 import dedent from "dedent";
 import { type Address, formatEther } from "viem";
 import { BRIDGE_EVENT_ABI } from "../lib/bridge-event.abi.js";
-import {
-	BRIDGE_ADDRESS,
-	IQ_TOKEN_ETHEREUM_ADDRESS,
-	MIN_IQ_THRESHOLD,
-} from "../lib/constants.js";
+import { BRIDGE_ADDRESS } from "../lib/constants.js";
 import { type BridgeEvent, bridgeEvents } from "../lib/events.js";
 import type { WalletService } from "./wallet.service.js";
 
@@ -44,25 +40,13 @@ export class EventService {
 	private async processBridgeLog(log: any): Promise<BridgeEvent | null> {
 		const { localToken, from, to, amount } = log.args;
 
-		// Only process IQ token bridges
-		if (localToken.toLowerCase() !== IQ_TOKEN_ETHEREUM_ADDRESS.toLowerCase()) {
-			return null;
-		}
-
 		console.log(dedent`
-      🌉 IQ Bridge Detected:
+      🌉 Bridge Detected:
+      Token:   ${localToken}
       From:    ${from}
       To:      ${to}
-      Amount:  ${formatEther(amount)} IQ
+      Amount:  ${formatEther(amount)}
       Tx:      ${log.transactionHash}`);
-
-		// Check if amount meets threshold
-		if (amount < MIN_IQ_THRESHOLD) {
-			console.log(
-				`⏭️ Amount below threshold (${formatEther(MIN_IQ_THRESHOLD)} IQ), skipping`,
-			);
-			return null;
-		}
 
 		return {
 			blockNumber: log.blockNumber,
