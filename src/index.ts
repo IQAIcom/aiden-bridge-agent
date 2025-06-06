@@ -2,7 +2,7 @@ import {
 	getTelegramAgent,
 	sendTelegramMessage,
 } from "./agents/telegram-agent.js";
-import { bridgeEvents } from "./lib/events.js";
+import { bridgeEvents } from "./services/event-emitter.service.js";
 import { MonitorService } from "./services/monitor.service.js";
 
 async function main() {

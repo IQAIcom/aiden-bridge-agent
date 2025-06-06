@@ -1,11 +1,11 @@
 import { type Address, formatEther, withRetry } from "viem";
 import { fraxtal } from "viem/chains";
-import { FUNDING_AMOUNT } from "../lib/constants.js";
+import { FUNDING_AMOUNT } from "../env.js";
 import {
 	type BridgeEvent,
 	type FundingEvent,
 	bridgeEvents,
-} from "../lib/events.js";
+} from "./event-emitter.service.js";
 import type { WalletService } from "./wallet.service.js";
 
 export class FundService {

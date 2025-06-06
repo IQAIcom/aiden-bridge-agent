@@ -1,10 +1,59 @@
 import dedent from "dedent";
 import { type Address, formatEther } from "viem";
-import { BRIDGE_EVENT_ABI } from "../lib/bridge-event.abi.js";
-import { BRIDGE_ADDRESS } from "../lib/constants.js";
-import { type BridgeEvent, bridgeEvents } from "../lib/events.js";
+import { BRIDGE_ADDRESS } from "../env.js";
+import { type BridgeEvent, bridgeEvents } from "./event-emitter.service.js";
 import type { WalletService } from "./wallet.service.js";
 
+export const BRIDGE_EVENT_ABI = [
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "localToken",
+				type: "address",
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "remoteToken",
+				type: "address",
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "from",
+				type: "address",
+			},
+			{
+				indexed: false,
+				internalType: "address",
+				name: "to",
+				type: "address",
+			},
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "amount",
+				type: "uint256",
+			},
+			{
+				indexed: false,
+				internalType: "bytes",
+				name: "extraData",
+				type: "bytes",
+			},
+		],
+		name: "ERC20BridgeInitiated",
+		type: "event",
+	},
+] as const;
+
+/**
+ * Service for handling bridge events from a blockchain contract
+ * Watches for ERC20 bridge events and processes them
+ */
 export class EventService {
 	constructor(private walletService: WalletService) {}
 
