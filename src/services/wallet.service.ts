@@ -8,6 +8,10 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 import { fraxtal, mainnet } from "viem/chains";
 
+/**
+ * Service for managing blockchain wallet interactions across Ethereum and Fraxtal networks.
+ * Provides public and wallet clients for different blockchain networks with private key-based authentication.
+ */
 export class WalletService {
 	private publicEthClient: PublicClient;
 	private publicFraxtalClient: PublicClient;

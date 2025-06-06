@@ -3,6 +3,10 @@ import { EventService } from "./event.service.js";
 import { FundService } from "./fund.service.js";
 import { WalletService } from "./wallet.service.js";
 
+/**
+ * Manages monitoring and synchronization for a blockchain bridge
+ * Initializes event and fund watching services using a wallet
+ */
 export class MonitorService {
 	private eventWatcher: EventService;
 	private fundService: FundService;

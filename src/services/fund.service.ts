@@ -8,6 +8,10 @@ import {
 } from "./event-emitter.service.js";
 import type { WalletService } from "./wallet.service.js";
 
+/**
+ * Service responsible for funding recipient addresses after bridge events.
+ * Monitors bridge events, checks recipient balances, and executes funding transactions.
+ */
 export class FundService {
 	private readonly fundingAmount: bigint = FUNDING_AMOUNT;
 
