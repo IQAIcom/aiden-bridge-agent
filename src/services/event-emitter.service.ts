@@ -4,6 +4,7 @@ import type { Address } from "viem";
 export interface BridgeEvent {
 	blockNumber: number;
 	txHash: string;
+	localToken: Address;
 	from: Address;
 	to: Address;
 	amount: bigint;

@@ -4,18 +4,24 @@ import {
 } from "./agents/telegram-agent.js";
 import { bridgeEvents } from "./services/event-emitter.service.js";
 import { MonitorService } from "./services/monitor.service.js";
+import { TokenService } from "./services/token.service.js";
 
 async function main() {
 	console.log("🚀 Starting Bridge Monitor...");
 
 	const telegramAgent = await getTelegramAgent();
+	const tokenService = new TokenService();
 
 	// Set up event listeners (for future Telegram bot integration)
-	bridgeEvents.on("bridge:detected", (event) => {
+	bridgeEvents.on("bridge:detected", async (event) => {
 		console.log(`📊 Bridge event processed: ${event.txHash}`);
+		const formattedAmount = await tokenService.getFormattedTokenAmount(
+			event.amount,
+			event.localToken,
+		);
 		sendTelegramMessage(
 			telegramAgent,
-			`Bridge event detected: ${event.txHash}`,
+			`New Fraxtal bridge: ${formattedAmount} from ${event.from}`,
 		);
 	});
 

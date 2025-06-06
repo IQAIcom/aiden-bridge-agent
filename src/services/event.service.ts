@@ -100,6 +100,7 @@ export class EventService {
 		return {
 			blockNumber: Number(log.blockNumber),
 			txHash: log.transactionHash,
+			localToken,
 			from: from as Address,
 			to: to as Address,
 			amount: amount as bigint,
