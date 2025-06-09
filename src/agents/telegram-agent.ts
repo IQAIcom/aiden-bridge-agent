@@ -11,19 +11,9 @@ export const getTelegramAgent = async () => {
 		transport: {
 			mode: "stdio",
 			command: "npx",
-			args: [
-				"-y",
-				"@smithery/cli@latest",
-				"run",
-				"@NexusX-MCP/telegram-mcp-server",
-				"--key",
-				env.TELEGRAM_SERVER_KEY,
-				"--profile",
-				env.TELEGRAM_PROFILE_ID,
-			],
+			args: ["-y", "@iqai/mcp-telegram"],
 			env: {
 				TELEGRAM_BOT_TOKEN: env.TELEGRAM_BOT_TOKEN,
-				TELEGRAM_CHAT_ID: env.TELEGRAM_CHAT_ID,
 				PATH: env.PATH,
 			},
 		},
@@ -66,6 +56,8 @@ export const sendTelegramMessage = (telegramAgent: Agent, message: string) => {
 		- "🌉 **New IQ Bridge Detected!**\n💰 Amount: 1,000 IQ\n👤 From: \`0x1234567890abcdef1234567890abcdef12345678\`"
 		- "✅ **Funding Successful!**\n🔗 TX: \`0xabcdef1234567890abcdef1234567890abcdef12\`"
 		- "⏭️ **Funding Skipped**\nUser already has sufficient funds\n🔗 TX: \`0xdef456789abcdef456789abcdef456789abcdef45\`"
+
+		For ChatId, please use this: ${env.TELEGRAM_CHAT_ID}
 
 		Keep messages concise but informative, maintain full address visibility, and always use a professional yet friendly tone for the community.
 	`;
