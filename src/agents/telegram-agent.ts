@@ -4,7 +4,7 @@ import { env } from "../env";
 
 export const getTelegramAgent = async () => {
 	const telegramToolSet = new McpToolset({
-		name: "Telegram MCP Client",
+		name: "telegram",
 		description: "Client for Telegram notifications",
 		debug: env.DEBUG,
 		retryOptions: { maxRetries: 2, initialDelay: 200 },
