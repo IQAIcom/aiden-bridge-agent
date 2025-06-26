@@ -8,6 +8,7 @@
 		"dev": "tsx watch src/index.ts",
 		"start": "node dist/index.js",
 		"clean": "rimraf dist",
+		"test": "jest --passWithNoTests",
 		"prebuild": "pnpm clean",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
@@ -33,6 +34,7 @@
 		"@iqai/adk": "^0.0.4",
 		"dedent": "^1.6.0",
 		"dotenv": "^16.4.5",
+		"ts-node": "^10.9.2",
 		"viem": "^2.30.6",
 		"zod": "^3.25.51"
 	},

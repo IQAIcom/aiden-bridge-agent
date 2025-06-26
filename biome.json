@@ -7,10 +7,36 @@
 		"enabled": true,
 		"rules": {
 			"recommended": true,
+			"correctness": {
+				"noUnusedVariables": "off",
+				"noConstructorReturn": "off"
+			},
+			"performance": {
+				"noDelete": "off"
+			},
+			"style": {
+				"noNonNullAssertion": "off",
+				"useShorthandArrayType": "error",
+				"useNodejsImportProtocol": "off",
+				"noUselessElse": "off",
+				"useImportType": "off",
+				"noInferrableTypes": "off",
+				"useNumberNamespace": "off"
+			},
 			"suspicious": {
-				"noExplicitAny": {
-					"level": "off"
-				}
+				"noArrayIndexKey": "off",
+				"noImplicitAnyLet": "off",
+				"noExplicitAny": "off",
+				"noAssignInExpressions": "off",
+				"noConfusingVoidType": "off",
+				"noExportsInTest": "off"
+			},
+			"complexity": {
+				"noForEach": "off",
+				"useLiteralKeys": "off"
+			},
+			"a11y": {
+				"noSvgWithoutTitle": "off"
 			}
 		}
 	},
