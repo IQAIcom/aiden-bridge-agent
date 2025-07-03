@@ -17,9 +17,6 @@ importers:
       dotenv:
         specifier: ^16.4.5
         version: 16.5.0
-      ts-node:
-        specifier: ^10.9.2
-        version: 10.9.2(@types/node@24.0.4)(typescript@5.8.3)
       viem:
         specifier: ^2.30.6
         version: 2.31.4(typescript@5.8.3)(zod@3.25.67)
@@ -42,6 +39,9 @@ importers:
       rimraf:
         specifier: ^6.0.1
         version: 6.0.1
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@24.0.4)(typescript@5.8.3)
       tsx:
         specifier: ^4.19.2
         version: 4.20.3
