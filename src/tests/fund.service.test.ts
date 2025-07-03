@@ -1,29 +1,33 @@
-import { Address, formatEther, withRetry } from "viem";
+import { Address, formatEther } from "viem";
 import { fraxtal } from "viem/chains";
+import { Mocked, afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { FUNDING_AMOUNT } from "../env";
 import { bridgeEvents } from "../services/event-emitter.service";
 import { FundService } from "../services/fund.service";
 import { type WalletService } from "../services/wallet.service";
 
-const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-const consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+const consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
-jest.mock("viem", () => ({
-	...jest.requireActual("viem"),
-	withRetry: jest.fn(
-		async (fn: () => Promise<any>, options: { retryCount: number }) => {
-			return await fn();
-		},
-	),
-}));
+vi.mock("viem", async () => {
+	const actual = await vi.importActual("viem");
+	return {
+		...actual,
+		withRetry: vi.fn(
+			async (fn: () => Promise<any>, options: { retryCount: number }) => {
+				return await fn();
+			},
+		),
+	};
+});
 
-jest.mock("../env", () => ({
+vi.mock("../env", () => ({
 	FUNDING_AMOUNT: 1000000000000000000n,
 }));
 
 describe("FundService", () => {
 	let fundService: FundService;
-	let mockWalletService: jest.Mocked<WalletService>;
+	let mockWalletService: Mocked<WalletService>;
 	let mockWalletClient: any;
 	let mockFraxtalClient: any;
 
@@ -34,24 +38,24 @@ describe("FundService", () => {
 		"0xTransactionHash000000000000000000000000000000";
 
 	beforeEach(() => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 
 		mockWalletClient = {
 			account: { address: mockFunderAddress },
-			sendTransaction: jest.fn(),
+			sendTransaction: vi.fn(),
 		};
 
 		mockFraxtalClient = {
-			getBalance: jest.fn(),
-			waitForTransactionReceipt: jest.fn(),
+			getBalance: vi.fn(),
+			waitForTransactionReceipt: vi.fn(),
 		};
 
 		mockWalletService = {
-			getWalletClient: jest.fn(() => mockWalletClient),
-			getPublicFraxtalClient: jest.fn(() => mockFraxtalClient),
-			createWalletClient: jest.fn(),
-			getPublicEthClient: jest.fn(),
-		} as unknown as jest.Mocked<WalletService>;
+			getWalletClient: vi.fn(() => mockWalletClient),
+			getPublicFraxtalClient: vi.fn(() => mockFraxtalClient),
+			createWalletClient: vi.fn(),
+			getPublicEthClient: vi.fn(),
+		} as unknown as Mocked<WalletService>;
 
 		fundService = new FundService(mockWalletService);
 	});
@@ -63,7 +67,7 @@ describe("FundService", () => {
 
 	describe("startWatching", () => {
 		it("should register a listener for bridge:detected events", () => {
-			const onSpy = jest.spyOn(bridgeEvents, "on");
+			const onSpy = vi.spyOn(bridgeEvents, "on");
 			fundService.startWatching();
 			expect(onSpy).toHaveBeenCalledWith(
 				"bridge:detected",
@@ -86,10 +90,10 @@ describe("FundService", () => {
 
 		it("should fund the recipient if balance is insufficient", async () => {
 			const recipientBalance = FUNDING_AMOUNT / 2n;
-			jest
-				.spyOn(fundService as any, "getRecipientBalance")
-				.mockResolvedValue(recipientBalance);
-			const executeFundingSpy = jest
+			vi.spyOn(fundService as any, "getRecipientBalance").mockResolvedValue(
+				recipientBalance,
+			);
+			const executeFundingSpy = vi
 				.spyOn(fundService as any, "executeFunding")
 				.mockResolvedValue(undefined);
 
@@ -112,14 +116,11 @@ describe("FundService", () => {
 
 		it("should skip funding if recipient already has sufficient ETH", async () => {
 			const recipientBalance = FUNDING_AMOUNT;
-			jest
-				.spyOn(fundService as any, "getRecipientBalance")
-				.mockResolvedValue(recipientBalance);
-			const executeFundingSpy = jest.spyOn(
-				fundService as any,
-				"executeFunding",
+			vi.spyOn(fundService as any, "getRecipientBalance").mockResolvedValue(
+				recipientBalance,
 			);
-			const emitSpy = jest.spyOn(bridgeEvents, "emit");
+			const executeFundingSpy = vi.spyOn(fundService as any, "executeFunding");
+			const emitSpy = vi.spyOn(bridgeEvents, "emit");
 
 			await (fundService as any).fundRecipient(mockBridgeEvent);
 
@@ -138,13 +139,10 @@ describe("FundService", () => {
 
 		it("should handle errors during funding process", async () => {
 			const error = new Error("Failed to get balance");
-			jest
-				.spyOn(fundService as any, "getRecipientBalance")
-				.mockRejectedValue(error);
-			const executeFundingSpy = jest.spyOn(
-				fundService as any,
-				"executeFunding",
+			vi.spyOn(fundService as any, "getRecipientBalance").mockRejectedValue(
+				error,
 			);
+			const executeFundingSpy = vi.spyOn(fundService as any, "executeFunding");
 
 			await (fundService as any).fundRecipient(mockBridgeEvent);
 
@@ -160,13 +158,13 @@ describe("FundService", () => {
 				...mockBridgeEvent,
 				to: "0x0000000000000000000000000000000000000000" as Address,
 			};
-			const getRecipientBalanceSpy = jest.spyOn(
+			const getRecipientBalanceSpy = vi.spyOn(
 				fundService as any,
 				"getRecipientBalance",
 			);
-			jest
-				.spyOn(fundService as any, "executeFunding")
-				.mockResolvedValue(undefined);
+			vi.spyOn(fundService as any, "executeFunding").mockResolvedValue(
+				undefined,
+			);
 
 			await (fundService as any).fundRecipient(mockZeroAddressEvent);
 
@@ -180,14 +178,14 @@ describe("FundService", () => {
 		const amountToFund = 500000000000000000n; // 0.5 ETH
 
 		it("should successfully execute a funding transaction", async () => {
-			jest
-				.spyOn(fundService, "getFunderBalance")
-				.mockResolvedValue(FUNDING_AMOUNT); // Sufficient balance
+			vi.spyOn(fundService, "getFunderBalance").mockResolvedValue(
+				FUNDING_AMOUNT,
+			); // Sufficient balance
 			mockWalletClient.sendTransaction.mockResolvedValue(mockTxHash);
 			mockFraxtalClient.waitForTransactionReceipt.mockResolvedValue({
 				status: "success",
 			});
-			const emitSpy = jest.spyOn(bridgeEvents, "emit");
+			const emitSpy = vi.spyOn(bridgeEvents, "emit");
 
 			await (fundService as any).executeFunding(
 				mockRecipientAddress,
@@ -226,10 +224,10 @@ describe("FundService", () => {
 		});
 
 		it("should not fund if funder balance is insufficient", async () => {
-			jest
-				.spyOn(fundService, "getFunderBalance")
-				.mockResolvedValue(amountToFund / 2n); // Insufficient
-			const emitSpy = jest.spyOn(bridgeEvents, "emit");
+			vi.spyOn(fundService, "getFunderBalance").mockResolvedValue(
+				amountToFund / 2n,
+			); // Insufficient
+			const emitSpy = vi.spyOn(bridgeEvents, "emit");
 
 			await (fundService as any).executeFunding(
 				mockRecipientAddress,

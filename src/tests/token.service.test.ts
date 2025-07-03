@@ -1,12 +1,16 @@
 import { createPublicClient, erc20Abi } from "viem";
 import { http } from "viem";
 import { mainnet } from "viem/chains";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TokenService } from "../services/token.service";
 
-jest.mock("viem", () => ({
-	...jest.requireActual("viem"),
-	createPublicClient: jest.fn(),
-}));
+vi.mock("viem", async () => {
+	const actual = await vi.importActual("viem");
+	return {
+		...actual,
+		createPublicClient: vi.fn(),
+	};
+});
 
 describe("TokenService", () => {
 	const mockTokenAddress =
@@ -15,12 +19,12 @@ describe("TokenService", () => {
 	let mockPublicClient: any;
 
 	beforeEach(() => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 
 		mockPublicClient = {
-			readContract: jest.fn(),
+			readContract: vi.fn(),
 		};
-		(createPublicClient as jest.Mock).mockReturnValue(mockPublicClient);
+		vi.mocked(createPublicClient).mockReturnValue(mockPublicClient);
 
 		tokenService = new TokenService();
 	});
@@ -121,7 +125,7 @@ describe("TokenService", () => {
 
 	describe("getFormattedTokenAmount", () => {
 		it("should combine token info fetch and formatting", async () => {
-			jest.spyOn(tokenService, "getTokenInfo").mockResolvedValue({
+			vi.spyOn(tokenService, "getTokenInfo").mockResolvedValue({
 				symbol: "TEST",
 				decimals: 18,
 			});
@@ -134,7 +138,7 @@ describe("TokenService", () => {
 		});
 
 		it("should handle errors in token info fetch", async () => {
-			jest.spyOn(tokenService, "getTokenInfo").mockResolvedValue({
+			vi.spyOn(tokenService, "getTokenInfo").mockResolvedValue({
 				symbol: "0x1234...7890",
 				decimals: 18,
 			});

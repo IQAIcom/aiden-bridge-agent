@@ -8,7 +8,7 @@
 		"dev": "tsx watch src/index.ts",
 		"start": "node dist/index.js",
 		"clean": "rimraf dist",
-		"test": "jest --passWithNoTests",
+		"test": "vitest run",
 		"prebuild": "pnpm clean",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
@@ -39,17 +39,13 @@
 		"zod": "^3.25.51"
 	},
 	"devDependencies": {
-		"@babel/preset-env": "^7.27.2",
-		"@babel/preset-typescript": "^7.27.1",
 		"@biomejs/biome": "^1.9.4",
-		"@types/jest": "^30.0.0",
 		"@types/node": "^24.0.4",
 		"husky": "^9.0.0",
-		"jest": "^30.0.3",
 		"lint-staged": "^16.1.0",
 		"rimraf": "^6.0.1",
-		"ts-jest": "^29.4.0",
 		"tsx": "^4.19.2",
-		"typescript": "^5.7.2"
+		"typescript": "^5.7.2",
+		"vitest": "^3.2.4"
 	}
 }
