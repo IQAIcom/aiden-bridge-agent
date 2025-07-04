@@ -1,4 +1,4 @@
-import { getAidenAgent } from "./agents/telegram-agent.js";
+import { getTelegramAgent } from "./agents/telegram-agent.js";
 import { bridgeEvents } from "./services/event-emitter.service.js";
 import { MonitorService } from "./services/monitor.service.js";
 import { TokenService } from "./services/token.service.js";
@@ -6,7 +6,7 @@ import { TokenService } from "./services/token.service.js";
 async function main() {
 	console.log("🚀 Starting Bridge Monitor...");
 
-	const agent = await getAidenAgent();
+	const agent = await getTelegramAgent();
 	const tokenService = new TokenService();
 
 	// Set up event listeners (for future Telegram bot integration)

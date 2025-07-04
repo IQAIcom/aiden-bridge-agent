@@ -2,7 +2,7 @@ import { AgentBuilder, McpToolset } from "@iqai/adk";
 import dedent from "dedent";
 import { env } from "../env";
 
-export const getAidenAgent = async () => {
+export const getTelegramAgent = async () => {
 	const telegramToolSet = new McpToolset({
 		name: "Telegram MCP Client",
 		description: "Client for Telegram notifications",
