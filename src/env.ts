@@ -15,6 +15,7 @@ export const envSchema = z.object({
 	TELEGRAM_BOT_TOKEN: z.string(),
 	WALLET_PRIVATE_KEY: z.string(),
 	PATH: z.string(),
+	LLM_MODEL: z.string().default("gemini-2.0-flash"),
 });
 
 export const env = envSchema.parse(process.env);

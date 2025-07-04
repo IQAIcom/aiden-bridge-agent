@@ -1,4 +1,4 @@
-import { Agent, McpToolset } from "@iqai/adk";
+import { AgentBuilder, McpToolset } from "@iqai/adk";
 import dedent from "dedent";
 import { env } from "../env";
 
@@ -21,18 +21,8 @@ export const getTelegramAgent = async () => {
 
 	const telegramTools = await telegramToolSet.getTools();
 
-	const agent = new Agent({
-		name: "telegram",
-		description: "Shares bridge updates to telegram group",
-		model: "gemini-2.0-flash",
-		tools: telegramTools,
-	});
-
-	return agent;
-};
-
-export const sendTelegramMessage = (telegramAgent: Agent, message: string) => {
-	const SYSTEM_PROMPT = dedent`
+	return AgentBuilder.create("aiden bridge agent")
+		.withInstruction(dedent`
 		You are the Aiden Bridge Agent, a specialized Telegram bot that monitors and reports IQ Bridge activities.
 
 		Your role is to take raw bridge monitoring data and format it into engaging, well-formatted Telegram messages with appropriate emojis.
@@ -60,18 +50,7 @@ export const sendTelegramMessage = (telegramAgent: Agent, message: string) => {
 		For ChatId, please use this: ${env.TELEGRAM_CHAT_ID}
 
 		Keep messages concise but informative, maintain full address visibility, and always use a professional yet friendly tone for the community.
-	`;
-
-	telegramAgent.run({
-		messages: [
-			{
-				role: "system",
-				content: SYSTEM_PROMPT,
-			},
-			{
-				role: "user",
-				content: message,
-			},
-		],
-	});
+	`)
+		.withModel(env.LLM_MODEL)
+		.withTools(...telegramTools);
 };

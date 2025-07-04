@@ -1,7 +1,4 @@
-import {
-	getTelegramAgent,
-	sendTelegramMessage,
-} from "./agents/telegram-agent.js";
+import { getTelegramAgent } from "./agents/telegram-agent.js";
 import { bridgeEvents } from "./services/event-emitter.service.js";
 import { MonitorService } from "./services/monitor.service.js";
 import { TokenService } from "./services/token.service.js";
@@ -9,7 +6,7 @@ import { TokenService } from "./services/token.service.js";
 async function main() {
 	console.log("🚀 Starting Bridge Monitor...");
 
-	const telegramAgent = await getTelegramAgent();
+	const agent = await getTelegramAgent();
 	const tokenService = new TokenService();
 
 	// Set up event listeners (for future Telegram bot integration)
@@ -19,20 +16,19 @@ async function main() {
 			event.amount,
 			event.localToken,
 		);
-		sendTelegramMessage(
-			telegramAgent,
+		await agent.ask(
 			`New Fraxtal bridge: ${formattedAmount} from ${event.from}`,
 		);
 	});
 
-	bridgeEvents.on("funding:completed", (event) => {
+	bridgeEvents.on("funding:completed", async (event) => {
 		console.log(`💸 Funding completed: ${event.txHash}`);
-		sendTelegramMessage(telegramAgent, `Funding completed: ${event.txHash}`);
+		await agent.ask(`Funding completed: ${event.txHash}`);
 	});
 
-	bridgeEvents.on("funding:skipped", (event) => {
+	bridgeEvents.on("funding:skipped", async (event) => {
 		console.log(`⏭️ Funding skipped for: ${event.txHash}`);
-		sendTelegramMessage(telegramAgent, `Funding skipped for: ${event.txHash}`);
+		await agent.ask(`Funding skipped for: ${event.txHash}`);
 	});
 
 	// Initialize and start the monitor
