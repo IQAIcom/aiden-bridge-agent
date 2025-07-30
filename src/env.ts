@@ -1,3 +1,7 @@
+import {
+	type LanguageModelV1,
+	createOpenRouter,
+} from "@openrouter/ai-sdk-provider";
 import { config } from "dotenv";
 import { parseEther } from "viem";
 import { z } from "zod/v4";
@@ -16,6 +20,21 @@ export const envSchema = z.object({
 	WALLET_PRIVATE_KEY: z.string(),
 	PATH: z.string(),
 	LLM_MODEL: z.string().default("gemini-2.0-flash"),
+	OPEN_ROUTER_KEY: z
+		.string()
+		.optional()
+		.describe("When given, agents use open-router endpoint instead"),
 });
 
 export const env = envSchema.parse(process.env);
+export let model: string | LanguageModelV1;
+
+if (env.OPEN_ROUTER_KEY) {
+	console.log("🚀 AGENT WILL USE OPENROUTER 🚀");
+	const openrouter = createOpenRouter({
+		apiKey: env.OPEN_ROUTER_KEY,
+	});
+	model = openrouter(env.LLM_MODEL);
+} else {
+	model = env.LLM_MODEL;
+}
