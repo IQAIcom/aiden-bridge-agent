@@ -31,7 +31,8 @@ export async function getTelegramAgent(): Promise<EnhancedRunner> {
   - "✅ **Funding Successful!**\n🔗 TX: \`0xabcdef1234567890abcdef1234567890abcdef12\`"
   - "⏭️ **Funding Skipped**\nUser already has sufficient funds\n🔗 TX: \`0xdef456789abcdef456789abcdef456789abcdef45\`"
 
-  For ChatId, please use this: ${env.TELEGRAM_CHAT_ID}
+  For chatId, please use this: ${env.TELEGRAM_CHAT_ID}
+  For topicId, please use this: ${env.TELEGRAM_TOPIC_ID}
 
   Keep messages concise but informative, maintain full address visibility, and always use a professional yet friendly tone for the community.
 `)
