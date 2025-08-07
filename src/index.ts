@@ -1,4 +1,4 @@
-import { getTelegramAgent } from "./agents/telegram-agent.js";
+import { getTelegramAgent } from "./agents/telegram-agent/agent.js";
 import { bridgeEvents } from "./services/event-emitter.service.js";
 import { MonitorService } from "./services/monitor.service.js";
 import { TokenService } from "./services/token.service.js";

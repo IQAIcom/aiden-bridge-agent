@@ -4,7 +4,7 @@
 	"description": "adk-agent-starter is a starter project for creating adk agents",
 	"main": "dist/index.js",
 	"scripts": {
-		"build": "tsc",
+		"build": "tsc && tsc-alias",
 		"dev": "tsx watch src/index.ts",
 		"start": "node dist/index.js",
 		"clean": "rimraf dist",
@@ -30,20 +30,27 @@
 		"url": "https://github.com/IQAICOM/adk-agent-starter/issues"
 	},
 	"homepage": "https://github.com/IQAICOM/adk-agent-starter#readme",
+	"pnpm": {
+		"overrides": {
+			"chalk": "^4.1.2"
+		}
+	},
 	"dependencies": {
-		"@iqai/adk": "^0.1.1",
+		"@iqai/adk": "^0.1.21",
+		"@openrouter/ai-sdk-provider": "^0.7.3",
 		"dedent": "^1.6.0",
 		"dotenv": "^16.4.5",
 		"viem": "^2.30.6",
 		"zod": "^3.25.51"
 	},
 	"devDependencies": {
-		"ts-node": "^10.9.2",
 		"@biomejs/biome": "^1.9.4",
 		"@types/node": "^24.0.4",
 		"husky": "^9.0.0",
 		"lint-staged": "^16.1.0",
 		"rimraf": "^6.0.1",
+		"ts-node": "^10.9.2",
+		"tsc-alias": "^1.8.16",
 		"tsx": "^4.19.2",
 		"typescript": "^5.7.2",
 		"vitest": "^3.2.4"
