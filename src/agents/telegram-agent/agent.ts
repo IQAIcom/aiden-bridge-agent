@@ -5,7 +5,7 @@ import { getTelegramTools } from "./tools";
 
 export async function getTelegramAgent(): Promise<EnhancedRunner> {
 	const tools = await getTelegramTools();
-	const builtAgent = await AgentBuilder.create("aiden bridge agent")
+	const builtAgent = await AgentBuilder.create("aiden_bridge_agent")
 		.withInstruction(dedent`
   You are the Aiden Bridge Agent, a specialized Telegram bot that monitors and reports IQ Bridge activities.
 
