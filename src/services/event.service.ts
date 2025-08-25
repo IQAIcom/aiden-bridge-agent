@@ -1,6 +1,6 @@
 import dedent from "dedent";
 import { type Address, formatEther } from "viem";
-import { BRIDGE_ADDRESS } from "../env.js";
+import { BRIDGE_ADDRESS, IQ_ADDRESSES, MIN_IQ_THRESHOLD } from "../env.js";
 import { type BridgeEvent, bridgeEvents } from "./event-emitter.service.js";
 import type { WalletService } from "./wallet.service.js";
 
@@ -72,16 +72,41 @@ export class EventService {
 	}
 
 	private async handleBridgeEvents(logs: any[]): Promise<void> {
-		console.log(`📥 Received ${logs.length} bridge event(s)`);
+		console.log(`📥 Received ${logs.length} logs from watchContractEvent`);
 
 		for (const log of logs) {
 			try {
+				const l1Token = log.args.localToken as Address;
+				const amount = log.args.amount as bigint;
+
+				// Filter for IQ token only (matching working production agent)
+				if (l1Token.toLowerCase() !== IQ_ADDRESSES.ethereum.toLowerCase()) {
+					console.log(`Skipping non-IQ token: ${l1Token}`);
+					continue;
+				}
+
 				const bridgeEvent = await this.processBridgeLog(log);
 				if (bridgeEvent) {
-					bridgeEvents.emit("bridge:detected", bridgeEvent);
+					console.log("✅ IQ Bridge event processed and emitted");
+
+					// Check minimum threshold (matching working production version)
+					if (amount >= MIN_IQ_THRESHOLD) {
+						console.log(
+							"🚀 Bridge event meets threshold, emitting for processing",
+						);
+						bridgeEvents.emit("bridge:detected", bridgeEvent);
+					} else {
+						console.log(
+							`⏭️ Skipping funding: Amount ${formatEther(amount)} IQ is below threshold of ${formatEther(MIN_IQ_THRESHOLD)} IQ`,
+						);
+						// Emit skipped event for agent to handle notification
+						bridgeEvents.emit("funding:skipped", bridgeEvent);
+					}
 				}
 			} catch (error) {
-				console.error("❌ Error processing bridge event:", error);
+				console.error(
+					`❌ Error processing event log: ${(error as Error).message}`,
+				);
 			}
 		}
 	}

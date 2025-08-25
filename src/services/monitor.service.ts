@@ -22,11 +22,20 @@ export class MonitorService {
 
 	async initialize(): Promise<void> {
 		try {
+			console.log("🚀 IQ Bridge Monitor starting up...");
+
 			this.eventWatcher.startWatching();
 			this.fundService.startWatching();
+
 			console.log("🚀 Bridge Monitor initialized successfully");
+			console.log(
+				"✅ IQ Bridge Monitor is now active and watching for IQ bridge events",
+			);
 		} catch (error) {
 			console.error("❌ Failed to initialize Bridge Monitor:", error);
+			console.error(
+				`❌ Bridge Monitor failed to start: ${(error as Error).message}`,
+			);
 			throw error;
 		}
 	}
