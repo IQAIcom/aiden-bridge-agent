@@ -1,6 +1,6 @@
 import { promises as fs } from "fs";
 import dedent from "dedent";
-import { type Address, formatEther, parseAbiItem } from "viem";
+import { type Address, Log, formatEther, parseAbiItem } from "viem";
 import { BRIDGE_ADDRESS, IQ_ADDRESSES, MIN_IQ_THRESHOLD } from "../env.js";
 import { type BridgeEvent, bridgeEvents } from "./event-emitter.service.js";
 import type { WalletService } from "./wallet.service.js";
@@ -8,6 +8,16 @@ import type { WalletService } from "./wallet.service.js";
 const BRIDGE_EVENT_ABI_ITEM = parseAbiItem(
 	"event ERC20BridgeInitiated(address indexed localToken, address indexed remoteToken, address indexed from, address to, uint256 amount, bytes extraData)",
 );
+
+type BridgeEventAbiItem = typeof BRIDGE_EVENT_ABI_ITEM;
+
+export type BridgeEventLog = Log<
+	bigint,
+	number,
+	false,
+	BridgeEventAbiItem,
+	true
+>;
 
 /**
  * Service for handling bridge events from a contract
@@ -128,10 +138,10 @@ export class EventService {
 	private async getLogsInChunks(
 		fromBlock: bigint,
 		toBlock: bigint,
-	): Promise<any[]> {
+	): Promise<BridgeEventLog[]> {
 		const ethClient = this.walletService.getPublicEthClient();
 		const maxBlocksPerChunk = 1000n; // RPC limit
-		let allLogs: any[] = [];
+		let allLogs: BridgeEventLog[] = [];
 
 		let currentFrom = fromBlock;
 
@@ -149,6 +159,7 @@ export class EventService {
 					event: BRIDGE_EVENT_ABI_ITEM,
 					fromBlock: currentFrom,
 					toBlock: currentTo,
+					strict: true,
 				});
 
 				allLogs = allLogs.concat(logs);
@@ -166,7 +177,7 @@ export class EventService {
 		return allLogs;
 	}
 
-	private async handleBridgeEvents(logs: any[]): Promise<void> {
+	private async handleBridgeEvents(logs: BridgeEventLog[]): Promise<void> {
 		console.log(`🔥 Processing ${logs.length} bridge events`);
 
 		for (const log of logs) {
@@ -208,27 +219,34 @@ export class EventService {
 		}
 	}
 
-	private async processBridgeLog(log: any): Promise<BridgeEvent | null> {
-		console.log("🔍 Processing bridge log", log);
+	private async processBridgeLog(
+		log: BridgeEventLog,
+	): Promise<BridgeEvent | null> {
 		const { localToken, from, to, amount } = log.args;
+
+		const ethClient = this.walletService.getPublicEthClient();
+		const block = await ethClient.getBlock({ blockNumber: log.blockNumber! });
+		const timestampSeconds = Number(block.timestamp);
+		const timestampMillis = timestampSeconds * 1000;
 
 		console.log(dedent`
       🌉 IQ Bridge Detected:
       Token:   ${localToken}
       From:    ${from}
       To:      ${to}
-      Amount:  ${formatEther(amount)} IQ
+      Amount:  ${formatEther(amount ?? 0n)} IQ
       Block:   ${log.blockNumber}
-      Tx:      ${log.transactionHash}`);
+      Tx:      ${log.transactionHash}
+      Timestamp: ${timestampSeconds} (${new Date(timestampMillis).toISOString()})`);
 
 		return {
 			blockNumber: Number(log.blockNumber),
 			txHash: log.transactionHash,
-			localToken,
+			localToken: localToken as Address,
 			from: from as Address,
 			to: to as Address,
 			amount: amount as bigint,
-			timestamp: Number(log.blockTimestamp * 1000),
+			timestamp: timestampMillis,
 		};
 	}
 }
