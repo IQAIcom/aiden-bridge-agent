@@ -24,7 +24,8 @@ export class MonitorService {
 		try {
 			console.log("🚀 IQ Bridge Monitor starting up...");
 
-			this.eventWatcher.startWatching();
+			// Start services
+			await this.eventWatcher.startWatching();
 			this.fundService.startWatching();
 
 			console.log("🚀 Bridge Monitor initialized successfully");
@@ -38,5 +39,10 @@ export class MonitorService {
 			);
 			throw error;
 		}
+	}
+
+	stop(): void {
+		this.eventWatcher.stopWatching();
+		console.log("🛑 Bridge Monitor stopped");
 	}
 }
