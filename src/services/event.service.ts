@@ -18,6 +18,7 @@ export class EventService {
 	private lastProcessedBlock = 0n;
 	private pollingInterval = 30000;
 	private checkpointFile = "last-block.txt";
+	private initialBlockOffset = 1000n;
 
 	constructor(private walletService: WalletService) {}
 
@@ -51,10 +52,10 @@ export class EventService {
 			this.lastProcessedBlock = BigInt(blockData.trim());
 			console.log(`✅ Resuming from saved block: ${this.lastProcessedBlock}`);
 		} catch {
-			// If the file doesn't exist, start from the last 1000 blocks
+			// If the file doesn't exist, start from the last initialBlockOffset blocks
 			const ethClient = this.walletService.getPublicEthClient();
 			const currentBlock = await ethClient.getBlockNumber();
-			this.lastProcessedBlock = currentBlock - 1000n;
+			this.lastProcessedBlock = currentBlock - this.initialBlockOffset;
 			console.log(
 				`📝 First run: starting from block ${this.lastProcessedBlock}`,
 			);
@@ -62,14 +63,21 @@ export class EventService {
 		}
 	}
 
-	private async saveLastBlock(): Promise<void> {
-		try {
-			await fs.writeFile(
-				this.checkpointFile,
-				this.lastProcessedBlock.toString(),
-			);
-		} catch (error) {
-			console.error("❌ Error saving checkpoint:", error);
+	private async saveLastBlock(retries = 3): Promise<void> {
+		for (let i = 0; i < retries; i++) {
+			try {
+				await fs.writeFile(
+					this.checkpointFile,
+					this.lastProcessedBlock.toString(),
+				);
+				return;
+			} catch (error) {
+				if (i === retries - 1) {
+					this.stopWatching();
+					throw error;
+				}
+				await new Promise((resolve) => setTimeout(resolve, 1000 * 2 ** i));
+			}
 		}
 	}
 
@@ -149,6 +157,7 @@ export class EventService {
 					`❌ Error fetching chunk ${currentFrom}-${currentTo}:`,
 					error,
 				);
+				throw error;
 			}
 
 			currentFrom = currentTo + 1n;
@@ -219,7 +228,7 @@ export class EventService {
 			from: from as Address,
 			to: to as Address,
 			amount: amount as bigint,
-			timestamp: Date.now(),
+			timestamp: Number(log.blockTimestamp * 1000),
 		};
 	}
 }
