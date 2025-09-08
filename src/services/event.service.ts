@@ -26,7 +26,7 @@ export type BridgeEventLog = Log<
 export class EventService {
 	private isPolling = false;
 	private lastProcessedBlock = 0n;
-	private pollingInterval = 30000;
+	private pollingInterval = 60000; // Increased from 30s to 60s
 	private checkpointFile = "last-block.txt";
 	private initialBlockOffset = 1000n;
 
@@ -40,11 +40,14 @@ export class EventService {
 				`🎯 Starting event polling from block: ${this.lastProcessedBlock}`,
 			);
 			console.log(`👀 Watching bridge events on ${BRIDGE_ADDRESS}`);
-			console.log(`🔄 Polling every ${this.pollingInterval / 1000}s`);
+			console.log(
+				`🔄 Polling every ${this.pollingInterval / 1000}s with 100-block chunks`,
+			);
 
 			this.isPolling = true;
 			await this.pollForEvents();
-			this.startPollingLoop();
+			// Small delay before starting the loop
+			setTimeout(() => this.startPollingLoop(), 1000);
 		} catch (error) {
 			console.error("❌ Failed to start event watching:", error);
 			throw error;
@@ -140,7 +143,8 @@ export class EventService {
 		toBlock: bigint,
 	): Promise<BridgeEventLog[]> {
 		const ethClient = this.walletService.getPublicEthClient();
-		const maxBlocksPerChunk = 1000n; // RPC limit
+		const maxBlocksPerChunk = 999n; // Smaller chunks to avoid rate limits
+		const delayBetweenChunks = 200; // 200ms delay between chunks
 		let allLogs: BridgeEventLog[] = [];
 
 		let currentFrom = fromBlock;
@@ -163,6 +167,13 @@ export class EventService {
 				});
 
 				allLogs = allLogs.concat(logs);
+
+				// Add delay between chunks to avoid rate limiting
+				if (currentTo < toBlock) {
+					await new Promise((resolve) =>
+						setTimeout(resolve, delayBetweenChunks),
+					);
+				}
 			} catch (error) {
 				console.error(
 					`❌ Error fetching chunk ${currentFrom}-${currentTo}:`,

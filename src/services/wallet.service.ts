@@ -1,3 +1,4 @@
+import { env } from "@/env";
 import {
 	http,
 	type PublicClient,
@@ -20,7 +21,7 @@ export class WalletService {
 	constructor(privateKey: string) {
 		this.publicEthClient = createPublicClient({
 			chain: mainnet,
-			transport: http(),
+			transport: http(env.ALCHEMY_API_KEY),
 		}) as PublicClient;
 
 		this.publicFraxtalClient = createPublicClient({

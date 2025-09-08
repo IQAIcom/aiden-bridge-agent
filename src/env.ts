@@ -24,6 +24,7 @@ export const envSchema = z.object({
 	TELEGRAM_TOPIC_ID: z.string(),
 	TELEGRAM_BOT_TOKEN: z.string(),
 	WALLET_PRIVATE_KEY: z.string(),
+	ALCHEMY_API_KEY: z.string(),
 	PATH: z.string(),
 	LLM_MODEL: z.string().default("gemini-2.5-flash"),
 	OPEN_ROUTER_KEY: z
